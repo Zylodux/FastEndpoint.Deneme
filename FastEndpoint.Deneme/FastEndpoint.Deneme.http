@@ -1,0 +1,6 @@
+@FastEndpoint.Deneme_HostAddress = http://localhost:5252
+
+Post {{FastEndpoint.Deneme_HostAddress}}/api/user/create
+Accept: application/json
+
+###
