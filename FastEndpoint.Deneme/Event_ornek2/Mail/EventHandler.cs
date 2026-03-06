@@ -1,16 +1,36 @@
-﻿using FastEndpoint.Deneme.Event_ornek2.Register; // Haberi duymak için referans lazım
+﻿namespace Blog.Web.Features.Notifications.Email;
+
+using Blog.Web.Infrastructure.Services.Email;
+
+//using Auth.Register; // Haberi tanıması için
+using FastEndpoint.Deneme.Event_ornek2.Register;
 using FastEndpoints;
+//using Infrastructure.Services.Email; // Uzmanı tanıması için
 
-namespace FastEndpoint.Deneme.Event_ornek2.Mail;
-
-// EVENT HANDLER BURADA! 
-// Register klasöründe değil, Mail klasöründe çünkü maili bu gönderiyor.
-public class MailEventHandler : IEventHandler<UserRegisteredEvent>
+public class WelcomeMailHandler(IMailService mailService) : IEventHandler<UserRegisteredEvent>
 {
+    private readonly IMailService _mailService = mailService;
+
+    // Uzmanı (MailService) Dependency Injection ile içeri alıyoruz  
+
     public async Task HandleAsync(UserRegisteredEvent ev, CancellationToken ct)
     {
-        // Register modülünden gelen UserRegisteredEvent paketini açıyor
-        Console.WriteLine($"[MAIL] {ev.Email} adresine hoş geldin maili gitti.");
-        await Task.CompletedTask;
+        // Haberi (Event) aldık, uzmanı (Service) çalıştırıyoruz.
+        await _mailService.SendEmailAsync(
+            to: ev.Email,
+            subject: "Hoş Geldin!",
+            body: "Sitemize kayıt olduğun için teşekkürler."
+        );
+    }
+}
+//yarın şifremi unuttum dinleyicisi
+public class ResetPasswordMailHandler(IMailService mailService) : IEventHandler<ResetPasswordTokenGeneratedEvent>
+{
+    private readonly IMailService _mailService=mailService;
+
+    public async Task HandleAsync(ResetPasswordTokenGeneratedEvent ev, CancellationToken ct)
+    {
+        // Aynı uzman, farklı görev!
+        await _mailService.SendEmailAsync(ev.Email, "Şifre Sıfırlama", $"Token: {ev.Token}");
     }
 }
